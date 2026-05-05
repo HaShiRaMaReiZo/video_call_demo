@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'nav_dashboard' => 'Dashboard',
+    'nav_profile' => 'Profile',
+    'nav_log_out' => 'Log Out',
     'officer_ring_title' => 'Call a client by phone number',
     'officer_target_label' => 'Client phone number',
     'officer_start_call' => 'Ring and join call',

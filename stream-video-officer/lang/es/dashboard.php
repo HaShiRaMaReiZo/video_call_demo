@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'nav_dashboard' => 'Panel',
+    'nav_profile' => 'Perfil',
+    'nav_log_out' => 'Cerrar sesión',
     'officer_ring_title' => 'Llamar a un cliente por teléfono',
     'officer_target_label' => 'Teléfono del cliente',
     'officer_start_call' => 'Llamar y unirse',

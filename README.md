@@ -1,6 +1,6 @@
 # Stream Video demo: client + officer (two Laravel apps)
 
-Two separate Laravel 11 applications with **Inertia.js + React** and [Stream Video](https://getstream.io/video/). The **client** app registers end users by **phone number** (login with phone + password) and listens for incoming rings. The **officer** app enters the client’s **phone number**; it resolves **phone → Stream `user_id`** via a small server-to-server call to the client app (`CLIENT_APP_URL` + shared `OFFICER_LOOKUP_TOKEN`), then rings and joins the same call.
+Two separate Laravel 11 applications with **Blade + Vite + vanilla JavaScript** and [Stream Video](https://getstream.io/video/) via [`@stream-io/video-client`](https://www.npmjs.com/package/@stream-io/video-client). The **client** app registers end users by **phone number** (login with phone + password) and listens for incoming rings. The **officer** app enters the client’s **phone number**; it resolves **phone → Stream `user_id`** via a small server-to-server call to the client app (`CLIENT_APP_URL` + shared `OFFICER_LOOKUP_TOKEN`), then rings and joins the same call.
 
 ## Repository layout
 
@@ -17,25 +17,25 @@ Two separate Laravel 11 applications with **Inertia.js + React** and [Stream Vid
 |------------|-------------------|
 | **Laravel 11** | HTTP server, routing, auth, validation, config, queues/sessions/cache via DB, Artisan commands (`officer:create` on the officer app). |
 | **PHP 8.2+** | Runtime; shared **GetStream** helpers live in [`stream-sdk-php`](stream-sdk-php/) as the `StreamIo\` namespace (Composer `psr-4` from each app). |
-| **Inertia.js (Laravel adapter)** | Bridges Laravel and React: controllers return `Inertia::render('PageName', $props)` instead of Blade views for app pages; the root document is still a small Blade shell ([`resources/views/app.blade.php`](stream-video-client/resources/views/app.blade.php)). |
-| **React 18** | UI in [`resources/js/Pages/**/*.jsx`](stream-video-client/resources/js/Pages/) and shared components under `resources/js/Components/`. |
-| **Vite** | Bundles React/JS, dev server + HMR, loads `@vite` entrypoints from the Blade layout. |
-| **Laravel Breeze** | Auth scaffolding (login, register on client only, profile, middleware); stack is **Breeze + Inertia + React**. |
-| **Ziggy (`@routes`)** | Exposes named Laravel routes to the frontend as `route('name', params)` inside React. |
-| **Axios** | Used from React for JSON POSTs (e.g. `POST /stream/token`, Stream token) with CSRF from the meta tag set in Blade/bootstrap. |
+| **Blade** | Full-page UI from [`resources/views`](stream-video-client/resources/views/) (Breeze-style layouts, auth, profile, dashboards, active call shell). |
+| **Alpine.js** | Lightweight interactivity for Breeze components (e.g. nav dropdown) via [`resources/js/app.js`](stream-video-client/resources/js/app.js). |
+| **`@stream-io/video-client`** | Browser SDK for connect, ring listener (client dashboard), join/leave, and minimal local/remote `<video>` UI ([`resources/js/dashboard-client.js`](stream-video-client/resources/js/dashboard-client.js), [`resources/js/active-call.js`](stream-video-client/resources/js/active-call.js)). |
+| **Vite** | Multi-entry build (global `app.js`, dashboard script on client, shared `active-call.js`), dev server + HMR. |
+| **Laravel Breeze (views)** | Auth and profile Blade patterns; **no** Inertia or React runtime. |
+| **Axios** | Used from the Stream entry scripts for `POST /stream/token` and CSRF (meta tag + [`resources/js/bootstrap.js`](stream-video-client/resources/js/bootstrap.js)). |
 | **MySQL (or SQLite)** | Each app has its **own** `.env` and **own** database; there is **no shared users table** between client and officer. |
 | **GetStream Video** | Real-time video + server APIs (JWT from your backend, `getOrCreate` + ring). Same **Video app** credentials in both `.env` files. |
 | **Firebase JWT (php-jwt)** | Minting user tokens for Stream where the PHP examples use JWT signing. |
 
-## How Laravel and React work together (Inertia)
+## How Laravel, Blade, and Stream JS work together
 
-1. The user requests a URL (e.g. `/dashboard`). **Laravel** runs `routes/web.php`, applies middleware (`web`, `auth`, `verified`, custom `HandleInertiaRequests`), and a route closure or controller returns **`Inertia::render('Dashboard', [...])`**.
-2. **Inertia** responds with JSON containing the **page component name** (e.g. `Dashboard`) and **props** (`auth`, `stream`, `i18n`, etc.). Shared props come from [`HandleInertiaRequests`](stream-video-client/app/Http/Middleware/HandleInertiaRequests.php).
-3. The browser already loaded **`resources/js/app.jsx`**, which boots **React** and matches the page name to a component under `resources/js/Pages/Dashboard.jsx`.
-4. For **mutations**, React can either use **Inertia** (`router.post`, `useForm`) for traditional form posts to Laravel routes, or **Axios** for small JSON APIs (e.g. Stream token) that return data without a full page navigation.
-5. **Vite** serves/compiles JS during `npm run dev`; production uses `npm run build` and versioned assets from `public/build`.
+1. The user requests a URL (e.g. `/dashboard`). **Laravel** runs `routes/web.php`, applies middleware (`web`, `auth`, `verified`, `ShareBladeGlobals`, locale), and returns **`view(...)`** with the right Blade template.
+2. **Blade layouts** ([`resources/views/layouts/app.blade.php`](stream-video-client/resources/views/layouts/app.blade.php)) load global CSS/JS with `@vite` and push page-specific bundles with `@stack('scripts')` where needed.
+3. **Shared config for templates** (e.g. whether Stream env vars are set) comes from [`ShareBladeGlobals`](stream-video-client/app/Http/Middleware/ShareBladeGlobals.php) (`View::share('stream', ...)`).
+4. **Forms** (login, register, officer ring, profile) use normal HTML `POST`/`PATCH` to Laravel. **Stream-only pages** use **Axios** from small Vite entries to call `POST /stream/token` and run **`StreamVideoClient`** (ring events on the client dashboard; join + tracks on `/call/{type}/{id}`).
+5. **Vite** builds `resources/js/app.js` (Alpine + Axios bootstrap), **`dashboard-client.js`** (client only), and **`active-call.js`** (both apps).
 
-So: **Laravel owns routing, auth, secrets, and Stream server calls; React owns the interactive UI**; Inertia keeps them on one “app-shaped” navigation model without you writing a separate REST API for every screen.
+So: **Laravel owns routing, auth, secrets, and Stream server calls; Blade owns documents and forms; the Stream SDK owns in-browser call state** with minimal custom DOM for video and controls.
 
 ## Database structure (per application)
 
@@ -66,8 +66,8 @@ Phone is normalized on register/update; **Stream user id** is created at registr
 ```mermaid
 flowchart LR
   subgraph browser [Browser]
-    CR[Client React dashboard]
-    OR[Officer React dashboard]
+    CR[Client dashboard JS]
+    OR[Officer dashboard form]
   end
   subgraph clientApp [stream-video-client Laravel]
     CL[routes controllers]
@@ -96,11 +96,12 @@ flowchart LR
 
 | Concern | Client app | Officer app |
 |---------|------------|-------------|
-| Routes / pages | [`routes/web.php`](stream-video-client/routes/web.php), [`resources/js/Pages/`](stream-video-client/resources/js/Pages/) | [`routes/web.php`](stream-video-officer/routes/web.php), [`resources/js/Pages/`](stream-video-officer/resources/js/Pages/) |
+| Routes / pages | [`routes/web.php`](stream-video-client/routes/web.php), [`resources/views/`](stream-video-client/resources/views/) | [`routes/web.php`](stream-video-officer/routes/web.php), [`resources/views/`](stream-video-officer/resources/views/) |
 | Stream token | [`StreamTokenController`](stream-video-client/app/Http/Controllers/StreamTokenController.php) | Same pattern |
 | Ring + join | — | [`StreamRingController`](stream-video-officer/app/Http/Controllers/StreamRingController.php), [`ClientStreamLookupService`](stream-video-officer/app/Services/ClientStreamLookupService.php) |
 | Phone → id API | [`OfficerClientLookupController`](stream-video-client/app/Http/Controllers/Internal/OfficerClientLookupController.php) | — |
-| Active call UI | [`Pages/Video/ActiveCall.jsx`](stream-video-client/resources/js/Pages/Video/ActiveCall.jsx) | Same path in officer app |
+| Active call UI | [`resources/views/video/active-call.blade.php`](stream-video-client/resources/views/video/active-call.blade.php), [`resources/js/active-call.js`](stream-video-client/resources/js/active-call.js) | Same Blade + JS pattern |
+| Client dashboard Stream | [`resources/js/dashboard-client.js`](stream-video-client/resources/js/dashboard-client.js) | — (officer dashboard is a plain form) |
 | Stream server SDK wrapper | [`App\Services\StreamVideoService`](stream-video-client/app/Services/StreamVideoService.php) | Mirror under officer `app/Services/` |
 
 ## Prerequisites

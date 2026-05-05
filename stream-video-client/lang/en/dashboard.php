@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'nav_dashboard' => 'Dashboard',
+    'nav_profile' => 'Profile',
+    'nav_log_out' => 'Log Out',
     'video_id_help' => 'The officer calls you using your phone number only. Your Stream user id is shown for support/debugging.',
     'phone_label' => 'Phone number (digits you gave when registering)',
     'incoming_call' => 'Incoming video call',

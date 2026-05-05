@@ -1,3 +1,89 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .call-screen {
+        @apply rounded-2xl border border-slate-700/60 bg-slate-900/70 shadow-2xl shadow-slate-950/60 p-4 sm:p-6 backdrop-blur-sm;
+    }
+
+    .call-screen__header {
+        @apply flex flex-wrap items-center justify-between gap-3 mb-4;
+    }
+
+    .call-screen__eyebrow {
+        @apply text-xs uppercase tracking-[0.18em] text-slate-400;
+    }
+
+    .call-screen__title {
+        @apply text-lg sm:text-xl font-semibold text-slate-100;
+    }
+
+    .call-status {
+        @apply text-xs font-medium px-3 py-1.5 rounded-full border;
+    }
+
+    .call-status--connecting {
+        @apply text-amber-200 border-amber-500/40 bg-amber-500/10;
+    }
+
+    .call-status--ready {
+        @apply text-emerald-200 border-emerald-500/40 bg-emerald-500/10;
+    }
+
+    .call-status--warn {
+        @apply text-rose-200 border-rose-500/40 bg-rose-500/10;
+    }
+
+    .call-error {
+        @apply mb-4 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-100 px-4 py-3 text-sm;
+    }
+
+    .call-screen__videos {
+        @apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+    }
+
+    .call-tile__frame {
+        @apply relative rounded-xl overflow-hidden border border-slate-700/70 bg-slate-950 aspect-video;
+    }
+
+    .call-tile__video {
+        @apply h-full w-full object-cover;
+    }
+
+    .call-tile__badge {
+        @apply absolute top-2 left-2 rounded-full bg-black/50 text-slate-100 text-[11px] px-2.5 py-1 border border-white/20 backdrop-blur-sm;
+    }
+
+    .call-tile__badge--remote {
+        @apply bg-indigo-900/50;
+    }
+
+    .call-tile__empty {
+        @apply absolute inset-0 flex items-center justify-center text-center text-sm text-slate-300 bg-slate-950/70 px-5;
+    }
+
+    .call-tile__name {
+        @apply mt-2 text-xs text-slate-300 px-1 truncate;
+    }
+
+    .call-controls {
+        @apply mt-5 flex flex-wrap items-center justify-center gap-2;
+    }
+
+    .call-btn {
+        @apply inline-flex items-center justify-center rounded-lg border text-xs font-semibold uppercase tracking-wide px-4 py-2 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900;
+    }
+
+    .call-btn--secondary {
+        @apply border-slate-600 bg-slate-800/90 text-slate-100 hover:bg-slate-700 focus:ring-indigo-500;
+    }
+
+    .call-btn--active {
+        @apply border-emerald-400/70 bg-emerald-500/20 text-emerald-100;
+    }
+
+    .call-btn--danger {
+        @apply border-rose-500/70 bg-rose-600 text-rose-50 hover:bg-rose-500 focus:ring-rose-500;
+    }
+}

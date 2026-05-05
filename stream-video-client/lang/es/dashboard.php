@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'nav_dashboard' => 'Panel',
+    'nav_profile' => 'Perfil',
+    'nav_log_out' => 'Cerrar sesión',
     'video_id_help' => 'El oficial te llama solo con tu número de teléfono. Tu id de usuario Stream se muestra para soporte o depuración.',
     'phone_label' => 'Teléfono (los mismos dígitos que al registrarte)',
     'incoming_call' => 'Videollamada entrante',

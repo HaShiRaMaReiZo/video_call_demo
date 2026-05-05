@@ -4,7 +4,6 @@
         "checkJs": false,
         "module": "ESNext",
         "moduleResolution": "bundler",
-        "jsx": "react-jsx",
         "strict": false,
         "isolatedModules": true,
         "target": "ESNext",
@@ -13,15 +12,13 @@
         "skipLibCheck": true,
         "noEmit": true,
         "paths": {
-            "@/*": ["./resources/js/*"],
-            "ziggy-js": ["./vendor/tightenco/ziggy"]
+            "@/*": ["./resources/js/*"]
         }
     },
     "include": [
         "resources/js/**/*.ts",
         "resources/js/**/*.tsx",
         "resources/js/**/*.js",
-        "resources/js/**/*.jsx",
         "resources/js/**/*.d.ts"
     ]
 }

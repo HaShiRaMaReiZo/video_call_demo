@@ -5,7 +5,6 @@ use App\Http\Controllers\StreamRingController;
 use App\Http\Controllers\StreamTokenController;
 use App\Http\Controllers\VideoCallController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
     return auth()->check()
@@ -14,7 +13,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 class VideoCallController extends Controller
 {
-    public function show(Request $request, string $callType, string $callId): Response
+    public function show(Request $request, string $callType, string $callId): View
     {
-        return Inertia::render('Video/ActiveCall', [
+        return view('video.active-call', [
             'callType' => $callType,
             'callId' => $callId,
         ]);

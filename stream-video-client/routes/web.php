@@ -6,7 +6,6 @@ use App\Http\Controllers\StreamTokenController;
 use App\Http\Controllers\VideoCallController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::post('/internal/stream-user-id-by-phone', OfficerClientLookupController::class)
     ->middleware('throttle:120,1')
@@ -19,7 +18,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

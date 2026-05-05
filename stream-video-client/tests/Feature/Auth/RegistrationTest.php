@@ -23,7 +23,6 @@ class RegistrationTest extends TestCase
             'phone' => '+1 555 555 0100',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'locale' => 'en',
         ]);
 
         $this->assertAuthenticated();

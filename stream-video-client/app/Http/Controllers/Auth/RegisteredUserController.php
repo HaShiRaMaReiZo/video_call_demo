@@ -11,17 +11,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
-    public function create(): Response
+    public function create(): View
     {
-        return Inertia::render('Auth/Register');
+        return view('auth.register');
     }
 
     /**
@@ -35,7 +34,6 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:32',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'locale' => 'required|string|in:en,es',
         ]);
 
         $phoneDigits = PhoneDigits::normalize($request->string('phone')->toString());
@@ -56,7 +54,7 @@ class RegisteredUserController extends Controller
             'phone' => $phoneDigits,
             'email' => null,
             'password' => $request->string('password')->toString(),
-            'locale' => $request->input('locale'),
+            'locale' => config('app.locale'),
             'stream_user_id' => (string) Str::uuid(),
         ]);
 
