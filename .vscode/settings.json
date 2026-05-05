@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.phar": "plaintext"
+    },
+    "files.exclude": {
+        "composer.phar": true
+    },
+    "intelephense.files.exclude": ["**/*.phar", "**/composer.phar"]
+}

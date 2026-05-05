@@ -1,0 +1,5 @@
+# Local Composer binary (optional)
+/composer.phar
+
+# Upstream reference clone (optional)
+/_stream-php-ref/
